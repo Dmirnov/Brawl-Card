@@ -1,0 +1,15 @@
+﻿{
+  "name": "brawl-stars-rng-tycoon",
+  "tree": {
+    "$className": "DataModel",
+    "Workspace": {
+      "$className": "Workspace"
+    },
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "WorldSetup": {
+        "$path": "src/server/WorldSetup.server.lua"
+      }
+    }
+  }
+}
