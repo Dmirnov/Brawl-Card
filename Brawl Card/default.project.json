@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "brawl-stars-rng-tycoon",
   "tree": {
     "$className": "DataModel",
@@ -9,6 +9,9 @@
       "$className": "ServerScriptService",
       "WorldSetup": {
         "$path": "src/server/WorldSetup.server.lua"
+      },
+      "Design": {
+        "$path": "src/server/Design"
       }
     }
   }
