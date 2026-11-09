@@ -18,9 +18,21 @@ if oldWorld then
 	oldWorld:Destroy()
 end
 
-local oldBaseplate = Workspace:FindFirstChild("Baseplate")
-if oldBaseplate and oldBaseplate:IsA("BasePart") then
-	oldBaseplate:Destroy()
+-- Remove the default green flat world so it does not show around the designed map.
+-- The actual hub, stepped route, and personal bases are generated below.
+local terrain = Workspace:FindFirstChildOfClass("Terrain")
+if terrain then
+	terrain:Clear()
+end
+
+for _, object in ipairs(Workspace:GetDescendants()) do
+	if object:IsA("BasePart") then
+		local isNamedBaseplate = object.Name == "Baseplate"
+		local isHugeFlatFloor = object.Size.X >= 400 and object.Size.Z >= 400 and object.Size.Y <= 20
+		if isNamedBaseplate or isHugeFlatFloor then
+			object:Destroy()
+		end
+	end
 end
 
 local world = Instance.new("Folder")
@@ -57,13 +69,160 @@ makePart("Border_Back", Vector3.new(180, 1, 5), Vector3.new(0, 0.1, -87.5), purp
 makePart("Border_Left", Vector3.new(5, 1, 170), Vector3.new(-87.5, 0.1, 0), purple)
 makePart("Border_Right", Vector3.new(5, 1, 170), Vector3.new(87.5, 0.1, 0), blue)
 
--- Central star emblem.
-makePart("Star_Center", Vector3.new(22, 0.5, 22), Vector3.new(0, 0.35, 0), yellow)
-makePart("Star_Top", Vector3.new(10, 0.55, 19), Vector3.new(0, 0.55, -13), yellow)
-makePart("Star_Bottom", Vector3.new(10, 0.55, 19), Vector3.new(0, 0.55, 13), yellow)
-makePart("Star_Left", Vector3.new(19, 0.55, 10), Vector3.new(-13, 0.55, 0), yellow)
-makePart("Star_Right", Vector3.new(19, 0.55, 10), Vector3.new(13, 0.55, 0), yellow)
-makePart("Star_Core", Vector3.new(9, 0.8, 9), Vector3.new(0, 0.9, 0), dark)
+-- Raised adventure route inspired by the reference: the flat baseplate stays
+-- underneath as a safe playable foundation; stepped islands create the relief.
+local route = Instance.new("Folder")
+route.Name = "AdventureRoute"
+route.Parent = world
+
+local ice = Color3.fromRGB(105, 211, 255)
+local iceLight = Color3.fromRGB(200, 245, 255)
+local candy = Color3.fromRGB(242, 73, 208)
+local leaf = Color3.fromRGB(54, 190, 106)
+local leafLight = Color3.fromRGB(123, 232, 117)
+local coral = Color3.fromRGB(255, 118, 83)
+
+local function routePart(name, size, position, color, material, parent)
+	local part = makePart(name, size, position, color, material, parent or route)
+	part.TopSurface = Enum.SurfaceType.Smooth
+	part.BottomSurface = Enum.SurfaceType.Smooth
+	return part
+end
+
+-- Broad star-shaped plaza at the heart of the hub.
+routePart("StarPlaza_Foundation", Vector3.new(48, 1.4, 48), Vector3.new(0, 0.45, 0), dark, Enum.Material.Slate)
+routePart("StarPlaza_Rim", Vector3.new(43, 0.35, 43), Vector3.new(0, 1.25, 0), blue, Enum.Material.Neon)
+routePart("StarPlaza_Center", Vector3.new(35, 0.45, 35), Vector3.new(0, 1.62, 0), yellow, Enum.Material.SmoothPlastic)
+for i, spec in ipairs({
+	{ "North", Vector3.new(0, 1.65, -24), Vector3.new(13, 0.4, 24), 0 },
+	{ "South", Vector3.new(0, 1.65, 24), Vector3.new(13, 0.4, 24), 0 },
+	{ "West", Vector3.new(-24, 1.65, 0), Vector3.new(24, 0.4, 13), 0 },
+	{ "East", Vector3.new(24, 1.65, 0), Vector3.new(24, 0.4, 13), 0 },
+	{ "NorthWestRay", Vector3.new(-17, 1.66, -17), Vector3.new(10, 0.4, 25), -45 },
+	{ "NorthEastRay", Vector3.new(17, 1.66, -17), Vector3.new(10, 0.4, 25), 45 },
+	{ "SouthWestRay", Vector3.new(-17, 1.66, 17), Vector3.new(10, 0.4, 25), 45 },
+	{ "SouthEastRay", Vector3.new(17, 1.66, 17), Vector3.new(10, 0.4, 25), -45 },
+}) do
+	local ray = routePart("StarPlaza_Ray_" .. spec[1], spec[3], spec[2], yellow, Enum.Material.Neon)
+	ray.Orientation = Vector3.new(0, spec[4], 0)
+end
+routePart("StarPlaza_Core", Vector3.new(12, 0.8, 12), Vector3.new(0, 2.2, 0), dark, Enum.Material.Metal)
+local coreLight = routePart("StarPlaza_CoreLight", Vector3.new(8, 0.25, 8), Vector3.new(0, 2.72, 0), ice, Enum.Material.Neon)
+coreLight.CanCollide = false
+
+local function makeBiome(name, center, topY, mainColor, accentColor, label)
+	local model = Instance.new("Model")
+	model.Name = "Zone_" .. name
+	model.Parent = route
+	local base = routePart(name .. "_Island", Vector3.new(30, 3, 26), Vector3.new(center.X, topY - 1.5, center.Z), dark, Enum.Material.Slate, model)
+	base:SetAttribute("Biome", name)
+	routePart(name .. "_Top", Vector3.new(28, 0.5, 24), Vector3.new(center.X, topY - 0.25, center.Z), mainColor, Enum.Material.SmoothPlastic, model)
+	for i = -1, 1 do
+		local trim = routePart(name .. "_Trim_" .. i, Vector3.new(8, 0.35, 0.55), Vector3.new(center.X + i * 9, topY + 0.05, center.Z + 11.7), accentColor, Enum.Material.Neon, model)
+		trim.CanCollide = false
+	end
+	local marker = routePart(name .. "_Marker", Vector3.new(2, 8, 2), Vector3.new(center.X, topY + 4, center.Z - 8), dark, Enum.Material.Metal, model)
+	local flag = routePart(name .. "_Sign", Vector3.new(14, 4, 0.6), Vector3.new(center.X, topY + 7, center.Z - 8), dark, Enum.Material.SmoothPlastic, model)
+	flag.CanCollide = false
+	local gui = Instance.new("SurfaceGui")
+	gui.Name = "ZoneLabel"
+	gui.Face = Enum.NormalId.Front
+	gui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
+	gui.PixelsPerStud = 30
+	gui.Parent = flag
+	local text = Instance.new("TextLabel")
+	text.Name = "Title"
+	text.Size = UDim2.fromScale(1, 1)
+	text.BackgroundTransparency = 1
+	text.Text = label
+	text.TextColor3 = accentColor
+	text.TextStrokeColor3 = dark
+	text.TextStrokeTransparency = 0.15
+	text.TextScaled = true
+	text.Font = Enum.Font.GothamBlack
+	text.Parent = gui
+	marker.CanCollide = false
+	return model
+end
+
+-- The diagonal route crosses ice, candy, the central star plaza and jungle,
+-- then finishes at a small canyon lookout / exit. Heights stay gently walkable.
+local routeNodes = {
+	{ x = -62, z = 54, y = 3, name = "Ice", color = ice, accent = iceLight, label = "ЛЕДЯНАЯ ЗОНА" },
+	{ x = -34, z = 30, y = 2.4, name = "Candy", color = candy, accent = yellow, label = "КОНФЕТНАЯ ЗОНА" },
+	{ x = 0, z = 0, y = 1.9, name = "Star", color = yellow, accent = blue, label = "ЦЕНТРАЛЬНАЯ ПЛОЩАДЬ" },
+	{ x = 34, z = -30, y = 2.4, name = "Jungle", color = leaf, accent = leafLight, label = "ЗЕЛЁНАЯ ЗОНА" },
+	{ x = 62, z = -54, y = 3, name = "Canyon", color = sand, accent = coral, label = "ВЫХОД" },
+}
+
+for _, node in ipairs(routeNodes) do
+	if node.name ~= "Star" then
+		makeBiome(node.name, Vector3.new(node.x, 0, node.z), node.y, node.color, node.accent, node.label)
+	end
+end
+
+local function makeSteps(fromNode, toNode, segmentIndex)
+	local steps = 7
+	for step = 1, steps do
+		local alpha = step / (steps + 1)
+		local x = fromNode.x + (toNode.x - fromNode.x) * alpha
+		local z = fromNode.z + (toNode.z - fromNode.z) * alpha
+		local y = fromNode.y + (toNode.y - fromNode.y) * alpha
+		local tread = routePart(
+			"AdventureStep_" .. segmentIndex .. "_" .. step,
+			Vector3.new(9, 0.7, 8),
+			Vector3.new(x, y - 0.35, z),
+			(step % 2 == 0) and blue or purple,
+			Enum.Material.SmoothPlastic
+		)
+		tread.Orientation = Vector3.new(0, 45, 0)
+	end
+	local dx = toNode.x - fromNode.x
+	local dz = toNode.z - fromNode.z
+	local length = math.sqrt(dx * dx + dz * dz)
+	local bridge = routePart(
+		"AdventurePath_" .. segmentIndex,
+		Vector3.new(length, 0.3, 5.5),
+		Vector3.new((fromNode.x + toNode.x) / 2, (fromNode.y + toNode.y) / 2 - 0.45, (fromNode.z + toNode.z) / 2),
+		dark,
+		Enum.Material.Metal
+	)
+	bridge.Orientation = Vector3.new(0, 45, 0)
+	bridge.CanCollide = false
+end
+
+for index = 1, #routeNodes - 1 do
+	makeSteps(routeNodes[index], routeNodes[index + 1], index)
+end
+
+-- Snow crystals, candy props, jungle palms, and canyon rocks make the route
+-- read as distinct 3D regions from a distance without covering the walkways.
+for i = 1, 5 do
+	local x = -72 + i * 5
+	local crystal = routePart("IceCrystal_" .. i, Vector3.new(3, 9 + (i % 3) * 2, 3), Vector3.new(x, 7, 60 + (i % 2) * 5), iceLight, Enum.Material.Glass)
+	crystal.Transparency = 0.2
+	crystal.Orientation = Vector3.new(0, i * 19, (i % 2 == 0) and 8 or -8)
+end
+for i = 1, 4 do
+	local x = -43 + i * 5
+	local lollipop = routePart("CandyPop_" .. i, Vector3.new(1.2, 6, 1.2), Vector3.new(x, 5.3, 28 + (i % 2) * 6), (i % 2 == 0) and yellow or ice, Enum.Material.Metal)
+	local candyTop = routePart("CandyPopTop_" .. i, Vector3.new(4, 4, 1), lollipop.Position + Vector3.new(0, 4, 0), (i % 2 == 0) and candy or purple, Enum.Material.Neon)
+	candyTop.Shape = Enum.PartType.Ball
+end
+for i = 1, 4 do
+	local x = 28 + i * 5
+	local trunk = routePart("JunglePalmTrunk_" .. i, Vector3.new(2, 10, 2), Vector3.new(x, 5, -39 - (i % 2) * 5), Color3.fromRGB(125, 80, 48), Enum.Material.Wood)
+	local crown = routePart("JunglePalmCrown_" .. i, Vector3.new(8, 4, 8), trunk.Position + Vector3.new(0, 6, 0), leafLight, Enum.Material.Grass)
+	crown.Shape = Enum.PartType.Ball
+end
+for i = 1, 4 do
+	local rockPart = routePart("CanyonRock_" .. i, Vector3.new(7, 8 + i % 2 * 3, 7), Vector3.new(55 + i * 4, 4 + i % 2, -62 + i * 3), (i % 2 == 0) and coral or Color3.fromRGB(185, 83, 76), Enum.Material.Slate)
+	rockPart.Orientation = Vector3.new(0, i * 25, (i % 2 == 0) and 8 or -8)
+end
+
+-- Central star emblem details continue over the larger plaza.
+makePart("Star_Center", Vector3.new(20, 0.35, 20), Vector3.new(0, 2.9, 0), yellow, Enum.Material.Neon)
+makePart("Star_Core", Vector3.new(10, 0.9, 10), Vector3.new(0, 3.5, 0), dark, Enum.Material.Metal)
 
 -- Entrance gate, with the title plate floating above the arch.
 local gateZ = -78
@@ -227,6 +386,148 @@ local upgradeConfig = {
 	Luck = { attribute = "LuckLevel", baseCost = 125, maximum = 5, displayName = "УДАЧА" },
 }
 
+-- A one-off visual prototype for slot 1 (the first slot assigned to a player).
+-- It keeps the regular base systems,
+-- but dresses the plot as a small cartoon desert arena / canyon outpost.
+local function buildDesertBase(center, parent)
+	local wood = Color3.fromRGB(133, 72, 43)
+	local woodLight = Color3.fromRGB(190, 111, 57)
+	local red = Color3.fromRGB(230, 69, 75)
+	local cream = Color3.fromRGB(255, 235, 189)
+	local rock = Color3.fromRGB(179, 79, 77)
+	local rockLight = Color3.fromRGB(225, 112, 91)
+	local teal = Color3.fromRGB(74, 203, 173)
+	local function part(name, size, offset, color, material, shape, collide)
+		local p = makePart(name, size, center + offset, color, material or Enum.Material.SmoothPlastic, parent)
+		if shape then p.Shape = shape end
+		p.CanCollide = collide == true
+		return p
+	end
+	local function sign(name, text, offset, size)
+		local board = part(name, size, offset, dark, Enum.Material.SmoothPlastic, nil, false)
+		local gui = Instance.new("SurfaceGui")
+		gui.Name = name .. "Gui"
+		gui.Face = Enum.NormalId.Back
+		gui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
+		gui.PixelsPerStud = 35
+		gui.Parent = board
+		local label = Instance.new("TextLabel")
+		label.Size = UDim2.fromScale(1, 1)
+		label.BackgroundTransparency = 1
+		label.Text = text
+		label.TextColor3 = yellow
+		label.TextStrokeColor3 = dark
+		label.TextStrokeTransparency = 0.25
+		label.TextScaled = true
+		label.Font = Enum.Font.GothamBlack
+		label.Parent = gui
+		return board
+	end
+
+	-- Sandy plaza with a bright, chunky star badge in the middle.
+	part("DesertPlaza", Vector3.new(72, 0.35, 37), Vector3.new(0, 0.43, 24), Color3.fromRGB(255, 202, 105), Enum.Material.Sand, nil, false)
+	for i, tile in ipairs({
+		{ -22, 0, 14, blue }, { 22, 0, 14, purple }, { -22, 0, 34, red }, { 22, 0, 34, yellow },
+	}) do
+		part("PlazaTile_" .. i, Vector3.new(17, 0.18, 17), Vector3.new(tile[1], 0.68, tile[3]), tile[4], Enum.Material.SmoothPlastic, nil, false)
+	end
+	part("PlazaEmblemCenter", Vector3.new(10, 0.35, 10), Vector3.new(0, 0.9, 24), yellow, Enum.Material.Neon, nil, false)
+	for i, offset in ipairs({ Vector3.new(0, 0.92, 13), Vector3.new(0, 0.92, 35), Vector3.new(-11, 0.92, 24), Vector3.new(11, 0.92, 24) }) do
+		part("PlazaStarRay_" .. i, Vector3.new(8, 0.3, 8), offset, yellow, Enum.Material.Neon, nil, false).Orientation = Vector3.new(0, 45, 0)
+	end
+
+	-- Two-storey arena facade, side towers, broad stairs and a purple portal.
+	part("ArenaFoundation", Vector3.new(38, 1.5, 18), Vector3.new(0, 1, -35), dark, Enum.Material.Slate, nil, true)
+	part("ArenaLowerWall", Vector3.new(31, 8, 10), Vector3.new(0, 5.5, -38), Color3.fromRGB(38, 48, 112), nil, nil, true)
+	part("ArenaUpperWall", Vector3.new(27, 7, 8), Vector3.new(0, 13, -39), dark, nil, nil, true)
+	part("ArenaRoofTrim", Vector3.new(40, 1.2, 20), Vector3.new(0, 17, -35), blue, Enum.Material.Metal, nil, true)
+	for _, side in ipairs({ -1, 1 }) do
+		part("ArenaTower_" .. side, Vector3.new(8, 20, 12), Vector3.new(side * 18, 10, -35), blue, Enum.Material.Slate, nil, true)
+		part("ArenaTowerCap_" .. side, Vector3.new(10, 2, 14), Vector3.new(side * 18, 21, -35), purple, nil, nil, true)
+		part("ArenaTowerGlow_" .. side, Vector3.new(0.45, 7, 5), Vector3.new(side * 13.85, 9, -28.8), teal, Enum.Material.Neon, nil, false)
+	end
+	for step = 1, 9 do
+		part("ArenaStair_" .. step, Vector3.new(26, 0.55, 2.4), Vector3.new(0, 0.72 + (10 - step) * 0.48, -22 + step * 2.2), if step % 2 == 0 then blue else Color3.fromRGB(75, 85, 155), nil, nil, true)
+	end
+	local portal = part("ArenaPortal", Vector3.new(10, 11, 0.8), Vector3.new(0, 6.7, -25), purple, Enum.Material.Neon, nil, false)
+	portal.Transparency = 0.18
+	part("PortalFrameTop", Vector3.new(13, 1, 1.5), Vector3.new(0, 12.6, -25), yellow, Enum.Material.Neon, nil, false)
+	for _, side in ipairs({ -1, 1 }) do
+		part("PortalFrameSide_" .. side, Vector3.new(1, 12, 1.5), Vector3.new(side * 6.2, 6.5, -25), yellow, Enum.Material.Neon, nil, false)
+		local lamp = part("ArenaLamp_" .. side, Vector3.new(1.8, 4, 1.8), Vector3.new(side * 9, 3, -23), wood, nil, nil, false)
+		part("ArenaLampGlow_" .. side, Vector3.new(2.3, 2.3, 2.3), lamp.Position - center + Vector3.new(0, 2.4, 0), yellow, Enum.Material.Neon, Enum.PartType.Ball, false)
+	end
+	local emblem = sign("ArenaEmblem", "★", Vector3.new(0, 13, -34), Vector3.new(8, 7, 0.5))
+	emblem.Color = purple
+	for i, x in ipairs({ -11, 11 }) do
+		local banner = part("ArenaBanner_" .. i, Vector3.new(3.2, 8, 0.35), Vector3.new(x, 11, -29), if i == 1 then blue else purple, nil, nil, false)
+		local decal = Instance.new("SurfaceGui")
+		decal.Face = Enum.NormalId.Back
+		decal.Parent = banner
+		local skull = Instance.new("TextLabel")
+		skull.Size = UDim2.fromScale(1, 1)
+		skull.BackgroundTransparency = 1
+		skull.Text = "☠"
+		skull.TextColor3 = yellow
+		skull.TextScaled = true
+		skull.Font = Enum.Font.GothamBlack
+		skull.Parent = decal
+	end
+	sign("ArenaTitle", "ARENA • OUTPOST", Vector3.new(0, 18.2, -25), Vector3.new(22, 3, 0.5))
+
+	-- Small wooden side shops with striped awnings, lit windows and readable signs.
+	for _, side in ipairs({ -1, 1 }) do
+		local x = side * 43
+		local shopName = if side < 0 then "LeftShop" else "RightShop"
+		part(shopName .. "Floor", Vector3.new(19, 1, 16), Vector3.new(x, 0.9, -16), wood, Enum.Material.WoodPlanks, nil, true)
+		part(shopName .. "Back", Vector3.new(18, 10, 1), Vector3.new(x, 6, -22.5), wood, Enum.Material.WoodPlanks, nil, true)
+		part(shopName .. "Left", Vector3.new(1, 10, 13), Vector3.new(x - 8.5, 6, -16), wood, Enum.Material.WoodPlanks, nil, true)
+		part(shopName .. "Right", Vector3.new(1, 10, 13), Vector3.new(x + 8.5, 6, -16), wood, Enum.Material.WoodPlanks, nil, true)
+		part(shopName .. "Counter", Vector3.new(14, 2, 2), Vector3.new(x, 2.5, -10), woodLight, Enum.Material.WoodPlanks, nil, true)
+		for stripe = 1, 7 do
+			part(shopName .. "AwningStripe_" .. stripe, Vector3.new(2.8, 0.7, 9), Vector3.new(x - 8.4 + stripe * 2.4, 11.2, -15), if stripe % 2 == 0 then cream else red, nil, nil, false)
+		end
+		part(shopName .. "Awning", Vector3.new(20, 0.5, 10), Vector3.new(x, 10.8, -15), red, nil, nil, false)
+		part(shopName .. "Window", Vector3.new(0.25, 3.5, 5), Vector3.new(x + side * 6.8, 6.5, -12), yellow, Enum.Material.Neon, nil, false)
+		local shopSign = sign(shopName .. "Sign", if side < 0 then "SUPPLY" else "UPGRADES", Vector3.new(x, 12.3, -11), Vector3.new(15, 3, 0.5))
+		shopSign.Color = dark
+		for crate = 1, 3 do
+			local crateOffset = Vector3.new(x + (crate - 2) * 5, 2.2, -7 + (crate % 2) * 2)
+			part(shopName .. "Crate_" .. crate, Vector3.new(3.5, 3.5, 3.5), crateOffset, if crate % 2 == 0 then woodLight else wood, Enum.Material.WoodPlanks, nil, true)
+		end
+	end
+
+	-- Low-poly canyon rocks and cacti around the rim, leaving the entrance side open.
+	for i = 1, 14 do
+		local x = -56 + (i - 1) * 8
+		if x < -47 or x > -25 then
+			local height = 8 + (i % 4) * 2
+			local boulder = part("CanyonBackRock_" .. i, Vector3.new(8 + (i % 3), height, 7), Vector3.new(x, height / 2 + 0.4, -49), if i % 2 == 0 then rock else rockLight, Enum.Material.Slate, nil, true)
+			boulder.Orientation = Vector3.new(0, (i * 23) % 360, (i % 3 - 1) * 5)
+		end
+	end
+	for i, x in ipairs({ -54, -38, 38, 54 }) do
+		local z = if i < 3 then 43 else 40
+		part("CactusTrunk_" .. i, Vector3.new(2.4, 7 + (i % 2) * 2, 2.4), Vector3.new(x, 4.2, z), green, nil, Enum.PartType.Cylinder, false)
+		local arm = part("CactusArm_" .. i, Vector3.new(1.8, 4, 1.8), Vector3.new(x + 1.7, 4.8, z), green, nil, Enum.PartType.Cylinder, false)
+		arm.Orientation = Vector3.new(0, 0, 90)
+	end
+	for i = 1, 5 do
+		local barrel = part("DesertBarrel_" .. i, Vector3.new(3, 4, 3), Vector3.new(-51 + i * 5, 2.4, 38), if i % 2 == 0 then purple else wood, Enum.Material.WoodPlanks, Enum.PartType.Cylinder, true)
+		barrel.Orientation = Vector3.new(0, 0, 90)
+	end
+
+	-- Purple water tower at the rear-right corner and small pennants.
+	part("WaterTowerLeg_A", Vector3.new(2, 15, 2), Vector3.new(53, 7.5, -39), purple, Enum.Material.Metal, nil, true)
+	part("WaterTowerLeg_B", Vector3.new(2, 15, 2), Vector3.new(61, 7.5, -39), purple, Enum.Material.Metal, nil, true)
+	part("WaterTowerTank", Vector3.new(13, 7, 10), Vector3.new(57, 17, -39), purple, Enum.Material.Metal, nil, true)
+	part("WaterTowerGlow", Vector3.new(12, 1, 9), Vector3.new(57, 15, -39), teal, Enum.Material.Neon, nil, false)
+	for i = 1, 4 do
+		local flag = part("CanyonPennant_" .. i, Vector3.new(3.5, 2.3, 0.25), Vector3.new(-47 + i * 18, 15 + (i % 2), -45), if i % 2 == 0 then blue else red, nil, nil, false)
+		flag.Orientation = Vector3.new(0, 15, 0)
+	end
+end
+
 local function createPersonalBase(index, spec)
 	local model = Instance.new("Model")
 	model.Name = "PlayerBase_" .. index
@@ -235,8 +536,9 @@ local function createPersonalBase(index, spec)
 	model.Parent = personalBases
 
 	local center = Vector3.new(spec.x, 0, spec.z)
+	local desertPrototype = index == 1
 	makePart("BasePlatform", Vector3.new(128, 2, 108), center + Vector3.new(0, -1, 0), Color3.fromRGB(65, 70, 95), Enum.Material.Slate, model)
-	makePart("BaseColorInset", Vector3.new(120, 0.35, 100), center + Vector3.new(0, 0.2, 0), spec.color, Enum.Material.SmoothPlastic, model)
+	makePart("BaseColorInset", Vector3.new(120, 0.35, 100), center + Vector3.new(0, 0.2, 0), if desertPrototype then sand else spec.color, Enum.Material.SmoothPlastic, model)
 	makePart("BaseBorder_Front", Vector3.new(128, 0.7, 3), center + Vector3.new(0, 0.25, 52.5), yellow, Enum.Material.SmoothPlastic, model)
 	makePart("BaseBorder_Back", Vector3.new(128, 0.7, 3), center + Vector3.new(0, 0.25, -52.5), yellow, Enum.Material.SmoothPlastic, model)
 	local spawnPad = makePart("PlayerSpawnPoint", Vector3.new(12, 0.35, 12), center + Vector3.new(0, 0.55, 38), yellow, Enum.Material.SmoothPlastic, model)
@@ -300,40 +602,48 @@ local function createPersonalBase(index, spec)
 	end
 
 	-- Card gallery: twelve display slots, ready for the player's future collection.
-	local gallery = makePart("CardGallery", Vector3.new(34, 1, 32), center + Vector3.new(31, 0.85, -2), dark, Enum.Material.Metal, model)
+	local galleryCenter = if desertPrototype then Vector3.new(23, 0.85, 27) else Vector3.new(31, 0.85, -2)
+	local gallery = makePart("CardGallery", Vector3.new(34, 1, 32), center + galleryCenter, dark, Enum.Material.Metal, model)
 	for cardIndex = 1, 12 do
 		local row = math.floor((cardIndex - 1) / 4)
 		local column = (cardIndex - 1) % 4
-		local card = makePart("CardDisplay_" .. cardIndex, Vector3.new(5, 8, 0.8), center + Vector3.new(19 + column * 8, 5.5, -12 + row * 10), spec.color, Enum.Material.SmoothPlastic, model)
+		local cardOffset = if desertPrototype then Vector3.new(11 + column * 8, 5.5, 15 + row * 10) else Vector3.new(19 + column * 8, 5.5, -12 + row * 10)
+		local card = makePart("CardDisplay_" .. cardIndex, Vector3.new(5, 8, 0.8), center + cardOffset, if desertPrototype then blue else spec.color, Enum.Material.SmoothPlastic, model)
 		makePart("CardStar_" .. cardIndex, Vector3.new(2, 2, 0.3), card.Position + Vector3.new(0, 0, -0.55), yellow, Enum.Material.Neon, model)
 	end
 
 	-- Case conveyor with three static case placeholders.
-	makePart("CaseConveyor", Vector3.new(62, 1.2, 10), center + Vector3.new(-5, 0.9, -25), dark, Enum.Material.Metal, model)
-	makePart("ConveyorBelt", Vector3.new(58, 0.35, 7), center + Vector3.new(-5, 1.65, -25), Color3.fromRGB(40, 45, 58), Enum.Material.SmoothPlastic, model)
-	makePart("ConveyorRail_Left", Vector3.new(62, 0.8, 0.55), center + Vector3.new(-5, 2.05, -29.25), blue, Enum.Material.Metal, model)
-	makePart("ConveyorRail_Right", Vector3.new(62, 0.8, 0.55), center + Vector3.new(-5, 2.05, -20.75), blue, Enum.Material.Metal, model)
+	local conveyorCenter = if desertPrototype then Vector3.new(-30, 0.9, 17) else Vector3.new(-5, 0.9, -25)
+	makePart("CaseConveyor", Vector3.new(62, 1.2, 10), center + conveyorCenter, dark, Enum.Material.Metal, model)
+	makePart("ConveyorBelt", Vector3.new(58, 0.35, 7), center + conveyorCenter + Vector3.new(0, 0.75, 0), Color3.fromRGB(40, 45, 58), Enum.Material.SmoothPlastic, model)
+	makePart("ConveyorRail_Left", Vector3.new(62, 0.8, 0.55), center + conveyorCenter + Vector3.new(0, 1.15, -4.25), blue, Enum.Material.Metal, model)
+	makePart("ConveyorRail_Right", Vector3.new(62, 0.8, 0.55), center + conveyorCenter + Vector3.new(0, 1.15, 4.25), blue, Enum.Material.Metal, model)
 	for rollerIndex = 1, 10 do
-		local rollerX = -34 + (rollerIndex - 1) * 6
-		local roller = makePart("ConveyorRoller_" .. rollerIndex, Vector3.new(0.55, 7.3, 0.55), center + Vector3.new(rollerX, 1.95, -25), Color3.fromRGB(115, 125, 150), Enum.Material.Metal, model)
+		local rollerX = conveyorCenter.X - 29 + (rollerIndex - 1) * 6
+		local roller = makePart("ConveyorRoller_" .. rollerIndex, Vector3.new(0.55, 7.3, 0.55), center + Vector3.new(rollerX, 1.95, conveyorCenter.Z), Color3.fromRGB(115, 125, 150), Enum.Material.Metal, model)
 		roller.Shape = Enum.PartType.Cylinder
 		roller.Orientation = Vector3.new(90, 0, 0)
 	end
 	for caseIndex = 1, 3 do
-		local caseX = -25 + (caseIndex - 1) * 20
+		local caseX = conveyorCenter.X - 20 + (caseIndex - 1) * 20
 		local caseColor = if caseIndex == 1 then blue elseif caseIndex == 2 then purple else yellow
-		local case = makePart("ConveyorCase_" .. caseIndex, Vector3.new(5.2, 5.2, 5.2), center + Vector3.new(caseX, 4.4, -25), Color3.fromRGB(174, 95, 45), Enum.Material.WoodPlanks, model)
-		makePart("ConveyorCaseStripe_" .. caseIndex, Vector3.new(5.35, 0.75, 0.35), case.Position + Vector3.new(0, 0, -2.8), caseColor, Enum.Material.Neon, model)
+		local case = makePart("ConveyorCase_" .. caseIndex, Vector3.new(5.2, 5.2, 5.2), center + Vector3.new(caseX, 4.4, conveyorCenter.Z), Color3.fromRGB(174, 95, 45), Enum.Material.WoodPlanks, model)
+		makePart("ConveyorCaseStripe_" .. caseIndex, Vector3.new(5.35, 0.75, 0.35), case.Position + Vector3.new(0, 0, if desertPrototype then 2.8 else -2.8), caseColor, Enum.Material.Neon, model)
+	end
+	if desertPrototype then
+		buildDesertBase(center, model)
 	end
 
 	-- Upgrade terminals are visual placeholders; upgrade logic will be added later.
 	local function makeUpgradeMachine(machineName, label, zOffset, machineColor)
-		local machinePosition = center + Vector3.new(-37, 4.5, zOffset + 12)
+		local machinePosition = center + (if desertPrototype then Vector3.new(43, 4.5, zOffset + 25) else Vector3.new(-37, 4.5, zOffset + 12))
 		local machine = makePart("UpgradeMachine_" .. machineName, Vector3.new(10, 9, 8), machinePosition, dark, Enum.Material.Metal, model)
+		if desertPrototype then machine.Orientation = Vector3.new(0, 180, 0) end
 		machine:SetAttribute("UpgradeType", machineName)
 		machine:SetAttribute("BaseSlotNumber", index)
 		-- Front face points toward the open center of the base (+X).
-		local screen = makePart("UpgradeScreen_" .. machineName, Vector3.new(0.5, 4.5, 6.5), machine.Position + Vector3.new(5.25, 1, 0), machineColor, Enum.Material.Neon, model)
+		local screenOffset = if desertPrototype then Vector3.new(-5.25, 1, 0) else Vector3.new(5.25, 1, 0)
+		local screen = makePart("UpgradeScreen_" .. machineName, Vector3.new(0.5, 4.5, 6.5), machine.Position + screenOffset, machineColor, Enum.Material.Neon, model)
 		local machineLabel = Instance.new("BillboardGui")
 		machineLabel.Name = "UpgradeLabel_" .. machineName
 		machineLabel.Size = UDim2.fromOffset(170, 38)
@@ -366,6 +676,27 @@ local function createPersonalBase(index, spec)
 			baseSlotNumber = index,
 			upgradeType = machineName,
 		})
+	end
+	if desertPrototype then
+		local title = Instance.new("BillboardGui")
+		title.Name = "PrototypeBaseTitle"
+		title.Size = UDim2.fromOffset(230, 42)
+		title.StudsOffset = Vector3.new(0, 25, 0)
+		title.MaxDistance = 180
+		title.AlwaysOnTop = false
+		title.Adornee = model:FindFirstChild("ArenaEmblem")
+		title.Parent = model:FindFirstChild("ArenaEmblem")
+		local titleText = Instance.new("TextLabel")
+		titleText.Size = UDim2.fromScale(1, 1)
+		titleText.BackgroundColor3 = dark
+		titleText.BackgroundTransparency = 0.15
+		titleText.Text = "ПРОТОТИП • БАЗА 1"
+		titleText.TextColor3 = yellow
+		titleText.TextStrokeColor3 = dark
+		titleText.TextStrokeTransparency = 0.1
+		titleText.TextScaled = true
+		titleText.Font = Enum.Font.GothamBlack
+		titleText.Parent = title
 	end
 
 	makeUpgradeMachine("Speed", "СКОРОСТЬ", -25, blue)
@@ -558,7 +889,6 @@ spawn.Duration = 0
 spawn.Parent = world
 
 print("Brawl Card central spawn hub created")
-
 ```
 
 ## 2. CardSystems
