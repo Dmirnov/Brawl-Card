@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900" role="img" aria-labelledby="title desc">
+  <title id="title">Brawl Card — Social Plaza concept plan</title>
+  <desc id="desc">Top-down concept layout of a circular social plaza leading to a glowing gateway for the trade district.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#101a30"/><stop offset="1" stop-color="#182948"/></linearGradient>
+    <radialGradient id="plaza" cx="42%" cy="36%"><stop stop-color="#f9fbff"/><stop offset=".7" stop-color="#dce5f1"/><stop offset="1" stop-color="#899bb4"/></radialGradient>
+    <linearGradient id="road" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#d9e4f2"/><stop offset=".5" stop-color="#eef3fa"/><stop offset="1" stop-color="#cad7e8"/></linearGradient>
+    <radialGradient id="portal" cx="50%" cy="45%"><stop stop-color="#52e4d0" stop-opacity=".5"/><stop offset=".65" stop-color="#358fe9" stop-opacity=".24"/><stop offset="1" stop-color="#358fe9" stop-opacity="0"/></radialGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#050b18" flood-opacity=".48"/></filter>
+    <filter id="glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="13" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse"><path d="M36 0H0V36" fill="none" stroke="#9bb6db" stroke-opacity=".07" stroke-width="1"/></pattern>
+    <g id="lamp"><circle r="15" fill="#1e2c49" stroke="#526886" stroke-width="3"/><circle r="6" fill="#ffe49b" filter="url(#glow)"/></g>
+    <g id="tree"><circle r="28" fill="#183c45"/><circle r="22" fill="#42ad83"/><circle cx="-7" cy="-7" r="8" fill="#83dbb0" opacity=".72"/><circle r="3" fill="#d5ffdf" opacity=".9"/></g>
+    <g id="bench"><rect x="-30" y="-9" width="60" height="18" rx="6" fill="#79503d" stroke="#d49b5e" stroke-width="3"/><path d="M-22 10v11M22 10v11" stroke="#263653" stroke-width="5" stroke-linecap="round"/></g>
+  </defs>
+  <rect width="1400" height="900" rx="36" fill="url(#bg)"/>
+  <rect width="1400" height="900" rx="36" fill="url(#grid)"/>
+  <circle cx="1080" cy="510" r="250" fill="url(#portal)"/>
+
+  <!-- Header -->
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="76" y="82" fill="#5edcc7" font-size="17" font-weight="700" letter-spacing="4">WORLD DESIGN  /  PHASE 01</text>
+    <text x="74" y="143" fill="#f7f9ff" font-size="54" font-weight="800" letter-spacing="1">BRAWL CARD</text>
+    <text x="78" y="181" fill="#aebed5" font-size="20" letter-spacing="3">THE SOCIAL PLAZA</text>
+    <rect x="1170" y="65" width="154" height="42" rx="21" fill="#243858" stroke="#405a7e"/>
+    <circle cx="1193" cy="86" r="5" fill="#5edcc7"/>
+    <text x="1208" y="92" fill="#dce8fa" font-size="14" font-weight="700" letter-spacing="1.4">CONCEPT PLAN</text>
+  </g>
+
+  <!-- Promenade -->
+  <g filter="url(#shadow)">
+    <path d="M660 484 C730 484 742 548 818 548 C904 548 920 430 1001 430 C1060 430 1074 497 1129 497" fill="none" stroke="#101a30" stroke-opacity=".68" stroke-width="137" stroke-linecap="round"/>
+    <path d="M660 484 C730 484 742 548 818 548 C904 548 920 430 1001 430 C1060 430 1074 497 1129 497" fill="none" stroke="url(#road)" stroke-width="126" stroke-linecap="round"/>
+    <path d="M660 484 C730 484 742 548 818 548 C904 548 920 430 1001 430 C1060 430 1074 497 1129 497" fill="none" stroke="#edb84b" stroke-width="5" stroke-dasharray="18 18" stroke-linecap="round"/>
+    <path d="M660 432 C730 432 748 496 820 496 C902 496 920 378 1001 378 C1064 378 1082 445 1129 445 M660 536 C730 536 736 600 816 600 C906 600 920 482 1001 482 C1056 482 1066 549 1129 549" fill="none" stroke="#5e9fe8" stroke-width="3" opacity=".78"/>
+  </g>
+
+  <!-- Plaza discs -->
+  <g filter="url(#shadow)">
+    <circle cx="430" cy="498" r="261" fill="#0c1426" opacity=".6"/>
+    <circle cx="430" cy="484" r="250" fill="#263653" stroke="#526886" stroke-width="4"/>
+    <circle cx="430" cy="484" r="239" fill="url(#plaza)" stroke="#f8fbff" stroke-width="3"/>
+    <circle cx="430" cy="484" r="202" fill="none" stroke="#428fe5" stroke-width="10"/>
+    <circle cx="430" cy="484" r="190" fill="none" stroke="#b8c8dc" stroke-width="3" stroke-dasharray="3 12"/>
+    <circle cx="430" cy="484" r="74" fill="#1e2c49" stroke="#f2bd54" stroke-width="8"/>
+    <circle cx="430" cy="484" r="58" fill="#367fc9" stroke="#5be0cc" stroke-width="4"/>
+    <path d="M430 438l11 30 31 2-24 20 8 30-26-17-26 17 8-30-24-20 31-2z" fill="#f7fbff" opacity=".96"/>
+    <circle cx="430" cy="484" r="8" fill="#ffc450"/>
+  </g>
+
+  <!-- Radial paving inlays -->
+  <g stroke="#f0bc55" stroke-width="5" stroke-linecap="round" opacity=".9">
+    <path d="M430 286v35M430 647v35M232 484h34M594 484h34"/>
+    <path d="M290 344l25 25M545 599l25 25M290 624l25-25M545 369l25-25"/>
+  </g>
+  <g fill="#407fb4" opacity=".72">
+    <circle cx="430" cy="337" r="4"/><circle cx="578" cy="484" r="4"/><circle cx="430" cy="632" r="4"/><circle cx="282" cy="484" r="4"/>
+  </g>
+
+  <!-- Trees, benches and plaza lamps -->
+  <use href="#tree" x="290" y="346"/><use href="#tree" x="570" y="346"/><use href="#tree" x="290" y="622"/><use href="#tree" x="570" y="622"/>
+  <use href="#bench" x="367" y="356"/><use href="#bench" x="493" y="356"/><use href="#bench" x="367" y="612"/><use href="#bench" x="493" y="612"/>
+  <use href="#lamp" x="430" y="244"/><use href="#lamp" x="600" y="386"/><use href="#lamp" x="600" y="582"/><use href="#lamp" x="430" y="724"/><use href="#lamp" x="260" y="582"/><use href="#lamp" x="260" y="386"/>
+
+  <!-- Offset sculptural fountain -->
+  <g filter="url(#shadow)">
+    <circle cx="505" cy="480" r="53" fill="#1e2c49" stroke="#263653" stroke-width="6"/>
+    <circle cx="505" cy="480" r="44" fill="#dfe7f1" stroke="#edb84b" stroke-width="6"/>
+    <circle cx="505" cy="480" r="34" fill="#51c9e2" stroke="#fff" stroke-opacity=".7" stroke-width="3"/>
+    <circle cx="505" cy="480" r="17" fill="#4c9de4"/>
+    <path d="M505 451c-11 12-11 20 0 28 11-8 11-16 0-28z" fill="#e4ffff" opacity=".8"/>
+    <circle cx="505" cy="480" r="6" fill="#5be0cc"/>
+  </g>
+
+  <!-- Welcome arch -->
+  <g filter="url(#shadow)">
+    <rect x="625" y="448" width="24" height="102" rx="7" fill="#1e2c49" stroke="#edb84b" stroke-width="3"/>
+    <rect x="660" y="448" width="24" height="102" rx="7" fill="#1e2c49" stroke="#edb84b" stroke-width="3"/>
+    <rect x="632" y="441" width="45" height="13" rx="5" fill="#edb84b"/>
+  </g>
+
+  <!-- Portal gate -->
+  <g filter="url(#shadow)">
+    <rect x="1042" y="394" width="32" height="204" rx="15" fill="#1e2c49" stroke="#edb84b" stroke-width="4"/>
+    <rect x="1167" y="394" width="32" height="204" rx="15" fill="#1e2c49" stroke="#edb84b" stroke-width="4"/>
+    <rect x="1043" y="388" width="155" height="25" rx="12" fill="#edb84b"/>
+    <rect x="1062" y="426" width="112" height="146" rx="56" fill="url(#portal)" stroke="#5be0cc" stroke-width="5" filter="url(#glow)"/>
+    <rect x="1073" y="439" width="90" height="120" rx="45" fill="#43d7ce" fill-opacity=".16" stroke="#6dcaff" stroke-width="2"/>
+    <circle cx="1070" cy="446" r="7" fill="#5be0cc"/><circle cx="1100" cy="428" r="6" fill="#67b8ff"/><circle cx="1138" cy="428" r="6" fill="#5be0cc"/><circle cx="1166" cy="446" r="7" fill="#67b8ff"/>
+    <path d="M1087 535c24-27 45-27 65 0" fill="none" stroke="#d9fffb" stroke-width="3" stroke-linecap="round" opacity=".75"/>
+  </g>
+
+  <!-- Labels -->
+  <g font-family="Arial, Helvetica, sans-serif" font-weight="700" text-anchor="middle">
+    <rect x="324" y="204" width="212" height="42" rx="21" fill="#1e2c49" stroke="#526886"/>
+    <text x="430" y="231" fill="#e8f0fc" font-size="15" letter-spacing="2">SPAWN PLAZA</text>
+    <rect x="717" y="413" width="171" height="42" rx="21" fill="#1e2c49" stroke="#526886"/>
+    <text x="802" y="440" fill="#e8f0fc" font-size="15" letter-spacing="1.5">GRAND PROMENADE</text>
+    <rect x="1006" y="310" width="217" height="48" rx="24" fill="#1e2c49" stroke="#5be0cc" stroke-width="2"/>
+    <text x="1114" y="341" fill="#f7fbff" font-size="16" letter-spacing="2">THE EXCHANGE</text>
+    <text x="1118" y="635" fill="#5be0cc" font-size="14" letter-spacing="2">TRADE DISTRICT</text>
+    <text x="505" y="567" fill="#263653" font-size="13" letter-spacing="1.5">WATER FEATURE</text>
+  </g>
+
+  <!-- Legend card -->
+  <g font-family="Arial, Helvetica, sans-serif">
+    <rect x="78" y="766" width="1246" height="74" rx="22" fill="#1a2943" stroke="#344b6d"/>
+    <text x="109" y="810" fill="#f2f6ff" font-size="16" font-weight="700" letter-spacing="1.5">DESIGN LANGUAGE</text>
+    <circle cx="341" cy="803" r="7" fill="#428fe5"/><text x="360" y="809" fill="#b8c8dc" font-size="15">navigation blue</text>
+    <circle cx="530" cy="803" r="7" fill="#5be0cc"/><text x="549" y="809" fill="#b8c8dc" font-size="15">portal teal</text>
+    <circle cx="690" cy="803" r="7" fill="#edb84b"/><text x="709" y="809" fill="#b8c8dc" font-size="15">warm brass</text>
+    <circle cx="861" cy="803" r="7" fill="#42ad83"/><text x="880" y="809" fill="#b8c8dc" font-size="15">living green</text>
+    <path d="M1050 803h46" stroke="#e4ecf7" stroke-width="5" stroke-linecap="round"/><text x="1110" y="809" fill="#b8c8dc" font-size="15">open, walkable flow</text>
+  </g>
+  <text x="80" y="872" fill="#758aa8" font-family="Arial, Helvetica, sans-serif" font-size="13" letter-spacing="1.4">EARLY LAYOUT STUDY • GEOMETRY AND PROPORTIONS WILL BE TUNED IN ROBLOX STUDIO</text>
+</svg>
